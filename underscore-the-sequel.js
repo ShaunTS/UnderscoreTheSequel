@@ -2,6 +2,30 @@ var _II = {};
 
 (function(_ii) {
 
+    if(_.isUndefined(_ii)) {
+        _ii = {};
+    }
+
+    _ii.errors = {};
+
+    _ii.errors.failedGet = function(obj, keyString) {
+        throw Error(
+            [
+                '(_II ERROR) Failed get on obj[', obj, '] for keystring(', keyString, ') '
+            ].join("")
+        );
+    };
+
+    _ii.errors.failedGetType = function(obj, keyString, typ) {
+        throw Error(
+            [
+                '(_II ERROR) Failed get on obj[', obj,
+                '] for keystring(', keyString, ') ',
+                'not of type(', typ, ')'
+            ].join("")
+        );
+    };
+
     _ii.isNone = function(arg) {
         return (
             _.isUndefined(arg) || _.isNull(arg) || _.isNaN(arg)
@@ -139,6 +163,37 @@ var _II = {};
             fix.unshift("/");
 
         return fix.join("");
+    }
+
+
+
+
+    _ii.get = function(obj, keyString) {
+
+        if(!_ii.nonEmptyString(keyString))
+            _ii.errors.failedGet(obj, keyString)
+
+        try {
+            var tryVal = obj;
+
+            _.each(keyString.split("."), function(key) {
+                tryVal = tryVal[key];
+            });
+
+            return tryVal;
+        }
+        catch(e) {
+            _ii.errors.failedGet(obj, keyString)
+        }
+    }
+
+    _ii.getBoolean = function(obj, keyString) {
+        let getVal = _ii.get(obj, keyString);
+
+        if(typeof getVal !== 'boolean')
+            _ii.errors.failedGetType();
+
+        return getVal;
     }
 
     _ii.getOrElse = function(obj, keyString, fallback) {
