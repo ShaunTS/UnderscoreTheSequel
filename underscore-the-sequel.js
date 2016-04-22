@@ -82,6 +82,33 @@ var _II = {};
         );
     };
 
+    _ii.nonEmptyString = function(str) {
+        return (
+            !(_.isNull(str) || _.isUndefined(str)) &&
+            (typeof str == 'string') &&
+            (str.length > 0)
+        );
+    };
+
+    _ii.nonEmptyNumber = function(n) {
+        return (
+            !(_.isNull(n) || _.isUndefined(n) || _.isNaN(n)) && _.isNumber(n)
+        );
+    };
+
+    _ii.greaterThanZero = function(n) {
+        return (!_ii.nonEmptyNumber(n) && n > 0);
+    };
+
+    _ii.dateTypeOrNull = function(date) {
+
+        if(date instanceof Date) return date;
+
+        if(_ii.nonEmptyString(date)) return (new Date(date));
+
+        return null;
+    };
+
     _ii.sameElements = function(argA, argB) {
         if(_.any([argA, argB], function(arg) {
                 return !((arg instanceof Array) || (arg instanceof Object));
@@ -146,40 +173,6 @@ var _II = {};
         });
     };
 
-    _ii.nonEmptyString = function(str) {
-        return (
-            !(_.isNull(str) || _.isUndefined(str)) &&
-            (typeof str == 'string') &&
-            (str.length > 0)
-        );
-    }
-
-    _ii.nonEmptyNumber = function(n) {
-        return (
-            !(_.isNull(n) || _.isUndefined(n) || _.isNaN(n)) && _.isNumber(n)
-        );
-    };
-
-    _ii.greaterThanZero = function(n) {
-        return (!_ii.nonEmptyNumber(n) && n > 0);
-    };
-
-
-    _ii.println = function(tag, val) {
-        console.log("\n-------------------- " +tag);
-        console.log(val);
-        console.log("--------------------\n");
-    };
-
-    _ii.dateTypeOrNull = function(date) {
-
-        if(date instanceof Date) return date;
-
-        if(_ii.nonEmptyString(date)) return (new Date(date));
-
-        return null;
-    };
-
     _ii.urlLeadingSlash = function(url) {
 
         if(!_ii.nonEmptyString(url)) return url;
@@ -192,8 +185,22 @@ var _II = {};
         return fix.join("");
     }
 
+    _ii.getOrElse = function(obj, keyString, fallback) {
 
+        if(!_ii.nonEmptyString(keyString)) return fallback;
 
+        if(_ii.isMissing(obj, keyString)) return fallback;
+
+        var tryVal = obj;
+
+        _.each(keyString.split("."), function(key) {
+            tryVal = tryVal[key];
+        });
+
+        if(_ii.isNone(tryVal)) return fallback;
+
+        return tryVal;
+    };
 
     _ii.get = function(obj, keyString) {
 
@@ -222,23 +229,6 @@ var _II = {};
 
         return getVal;
     }
-
-    _ii.getOrElse = function(obj, keyString, fallback) {
-
-        if(!_ii.nonEmptyString(keyString)) return fallback;
-
-        if(_ii.isMissing(obj, keyString)) return fallback;
-
-        var tryVal = obj;
-
-        _.each(keyString.split("."), function(key) {
-            tryVal = tryVal[key];
-        });
-
-        if(_ii.isNone(tryVal)) return fallback;
-
-        return tryVal;
-    };
 
     _ii.getArray = function(obj, keyString) {
 
@@ -342,6 +332,12 @@ var _II = {};
         catch(e) {
             return fallback;
         }
+    };
+
+    _ii.println = function(tag, val) {
+        console.log("\n-------------------- " +tag);
+        console.log(val);
+        console.log("--------------------\n");
     };
 
 })(_II);
