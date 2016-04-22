@@ -6,12 +6,26 @@ var _II = {};
         _ii = {};
     }
 
+    function summarizeObject(obj) {
+        return [
+            "Object {", _.take(_.keys(obj), 4).join(":_, "), "..}"
+        ].join("");
+    };
+
+    _ii.describe = function(obj) {
+        if(obj instanceof Object)
+            return summarizeObject(obj);
+
+        return obj;
+    };
+
     _ii.errors = {};
 
     _ii.errors.failedGet = function(obj, keyString) {
         throw Error(
             [
-                '(_II ERROR) Failed get on obj[', obj, '] for keystring(', keyString, ') '
+                '(_II ERROR) Failed get on ', _ii.describe(obj),
+                ' for keystring(', keyString, ') '
             ].join("")
         );
     };
@@ -19,8 +33,8 @@ var _II = {};
     _ii.errors.failedGetType = function(obj, keyString, typ) {
         throw Error(
             [
-                '(_II ERROR) Failed get on obj[', obj,
-                '] for keystring(', keyString, ') ',
+                '(_II ERROR) Failed get on ', _ii.describe(obj),
+                ' for keystring(', keyString, ') ',
                 'not of type(', typ, ')'
             ].join("")
         );
