@@ -173,18 +173,6 @@ var _II = {};
         });
     };
 
-    _ii.urlLeadingSlash = function(url) {
-
-        if(!_ii.nonEmptyString(url)) return url;
-
-        let fix = [url];
-
-        if(url.charAt(0) !== "/")
-            fix.unshift("/");
-
-        return fix.join("");
-    }
-
     _ii.getOrElse = function(obj, keyString, fallback) {
 
         if(!_ii.nonEmptyString(keyString)) return fallback;
