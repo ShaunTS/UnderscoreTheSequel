@@ -190,124 +190,38 @@ var _II = {};
         return tryVal;
     };
 
-    _ii.get = function(obj, keyString) {
+    _ii.getArrayOrElse = function(obj, keyString, fb) {
 
-        if(!_ii.nonEmptyString(keyString))
-            throw _ii.errors.failedGet(obj, keyString);
+        let fallback = fb || [];
 
-        try {
-            var tryVal = obj;
+        let tryGet = _ii.getOrElse(obj, keyString, fallback);
 
-            _.each(keyString.split("."), function(key) {
-                tryVal = tryVal[key];
-            });
-
-            return tryVal;
-        }
-        catch(e) {
-            throw _ii.errors.failedGet(obj, keyString);
-        }
-    }
-
-    _ii.getBoolean = function(obj, keyString) {
-        let getVal = _ii.get(obj, keyString);
-
-        if(typeof getVal !== 'boolean')
-            throw _ii.errors.failedGetType(obj, keyString, 'boolean');
-
-        return getVal;
-    }
-
-    _ii.getArray = function(obj, keyString) {
-
-        let tryGet = _ii.getOrElse(obj, keyString, []);
-
-        let result = (tryGet instanceof Array) ? tryGet : [];
+        let result = (_ii.nonEmptyArray(tryGet)) ? tryGet : fallback;
 
         return result;
     }
 
-    _ii.getString = function(obj, keyString) {
 
-        if(!_ii.nonEmptyString(keyString)) return "";
+    _ii.getStringOrElse = function(obj, keyString, fb) {
 
-        try {
+        let fallback = fb || "";
 
-            var tryVal = obj;
+        let tryGet = _ii.getOrElse(obj, keyString, fallback)
 
-            _.each(keyString.split("."), function(key) {
-                tryVal = tryVal[key];
-            })
+        let result = (_ii.nonEmptyString(tryGet)) ? tryGet : fallback;
 
-            let result = (_ii.nonEmptyString(tryVal)) ? tryVal : "";
-
-            return result;
-        }
-        catch(e) {
-            return "";
-        }
+        return result;
     }
 
-    _ii.getStringOrElse = function(obj, keyString, fallback) {
+    _ii.getIntOrElse = function(obj, keyString, fb) {
 
-        if(!_ii.nonEmptyString(keyString)) return fallback;
+        let fallback = fb || NaN;
 
-        try {
+        let tryGet = _ii.getOrElse(obj, keyString, fallback)
 
-            var tryVal = obj;
+        let result = (_ii.nonEmptyNumber(tryGet)) ? tryGet : fallback;
 
-            _.each(keyString.split("."), function(key) {
-                tryVal = tryVal[key];
-            });
-
-            let result = (_ii.nonEmptyString(tryVal)) ? tryVal : fallback;
-
-            return result;
-        }
-        catch(e) {
-            return fallback;
-        }
-    }
-
-    _ii.getInt = function(obj, keyString, fallback) {
-
-        if(!_ii.nonEmptyString(keyString)) return "";
-
-        try {
-            var tryVal = obj;
-
-            _.each(keyString.split("."), function(key) {
-                tryVal = tryVal[key];
-            });
-
-            let result = (_ii.nonEmptyNumber(tryVal)) ? tryVal : NaN;
-
-            return result;
-        }
-        catch(e) {
-            return NaN;
-        }
-    };
-
-    _ii.getIntOrElse = function(obj, keyString, fallback) {
-
-        if(!_ii.nonEmptyString(keyString)) return "";
-
-        try {
-
-            var tryVal = obj;
-
-            _.each(keyString.split("."), function(key) {
-                tryVal = tryVal[key];
-            });
-
-            let result = (_ii.nonEmptyNumber(tryVal)) ? tryVal : fallback;
-
-            return result;
-        }
-        catch(e) {
-            return fallback;
-        }
+        return result;
     };
 
     _ii.parseIntOrElse = function(num, fallback) {
@@ -321,6 +235,11 @@ var _II = {};
             return fallback;
         }
     };
+
+    _ii.get = _ii.getOrElse;
+    _ii.getArray = _ii.getArrayOrElse;
+    _ii.getString = _ii.getStringOrElse;
+    _ii.getInt = _ii.getIntOrElse;
 
     _ii.println = function(tag, val) {
         console.log("\n-------------------- " +tag);
