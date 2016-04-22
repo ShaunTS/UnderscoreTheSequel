@@ -21,25 +21,6 @@ var _II = {};
 
     _ii.errors = {};
 
-    _ii.errors.failedGet = function(obj, keyString) {
-        return Error(
-            [
-                '(_II ERROR) Failed get on ', _ii.describe(obj),
-                ' for keystring(', keyString, ') '
-            ].join("")
-        );
-    };
-
-    _ii.errors.failedGetType = function(obj, keyString, typ) {
-        return Error(
-            [
-                '(_II ERROR) Failed get on ', _ii.describe(obj),
-                ' for keystring(', keyString, ') ',
-                'not of type(', typ, ')'
-            ].join("")
-        );
-    };
-
     _ii.errors.badArg = function(functionName, expected, pos) {
         var position = pos || "First";
 
@@ -240,6 +221,102 @@ var _II = {};
     _ii.getArray = _ii.getArrayOrElse;
     _ii.getString = _ii.getStringOrElse;
     _ii.getInt = _ii.getIntOrElse;
+
+
+
+    _ii.errors.failedGet = function(obj, keyString, path) {
+        return Error(
+            [
+                '(_II ERROR) Failed get on ', _ii.describe(obj),
+                ' for keystring(', keyString, ') ',
+                'Found(', path.join("."), ')'
+            ].join("")
+        );
+    };
+
+    _ii.errors.failedGetType = function(obj, keyString, typ) {
+        return Error(
+            [
+                '(_II ERROR) Failed get on ', _ii.describe(obj),
+                ' for keystring(', keyString, ') ',
+                'not of type(', typ, ')'
+            ].join("")
+        );
+    };
+
+    _ii.strict = {};
+
+    _ii.strict.get = function(obj, keyString) {
+
+        if(!_ii.nonEmptyString(keyString))
+            throw _ii.errors.badArg('get', 'a non-empty String', 'Second');
+
+        var path = [];
+
+        try {
+            var tryVal = obj;
+
+            _.each(keyString.split("."), function(key) {
+
+                if(_.has(tryVal, key)) path.push(key);
+
+                tryVal = tryVal[key];
+            });
+
+            return tryVal;
+        }
+        catch(e) {
+            throw _ii.errors.failedGet(obj, keyString, path);
+        }
+    }
+
+    _ii.strict.getBoolean = function(obj, keyString) {
+
+        if(!_ii.nonEmptyString(keyString))
+            throw _ii.errors.badArg('getBoolean', 'a non-empty String', 'Second');
+
+        let getVal = _ii.strict.get(obj, keyString);
+
+        if(typeof getVal == 'boolean') return getVal;
+
+        throw _ii.errors.failedGetType(obj, keyString, 'boolean');
+    }
+
+    _ii.strict.getString = function(obj, keyString) {
+
+        if(!_ii.nonEmptyString(keyString))
+            throw _ii.errors.badArg('getString', 'a non-empty String', 'Second');
+
+        let getVal = _ii.strict.get(obj, keyString);
+
+        if(typeof getVal == 'string') return getVal;
+
+        throw _ii.errors.failedGetType(obj, keyString, 'string');
+    }
+
+    _ii.strict.getArray = function(obj, keyString) {
+
+        if(!_ii.nonEmptyString(keyString))
+            throw _ii.errors.badArg('getArray', 'a non-empty String', 'Second');
+
+        let getVal = _ii.strict.get(obj, keyString);
+
+        if(getVal instanceof Array) return getVal;
+
+        throw _ii.errors.failedGetType(obj, keyString, 'Array');
+    }
+
+    _ii.strict.getInt = function(obj, keyString) {
+
+        if(!_ii.nonEmptyString(keyString))
+            throw _ii.errors.badArg('getInt', 'a non-empty String', 'Second');
+
+        let getVal = _ii.strict.get(obj, keyString);
+
+        if(_ii.nonEmptyNumber(getVal)) return getVal;
+
+        throw _ii.errors.failedGetType(obj, keyString, 'integer');
+    }
 
     _ii.println = function(tag, val) {
         console.log("\n-------------------- " +tag);
