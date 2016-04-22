@@ -61,6 +61,11 @@ let obj = {
 ##### Getting nested object variables (_with_ errors)  
  
  ```javascript
- _II.strict.getArray(user, 'info.otherInfo.something.lists');
- => Uncaught Error: (_II ERROR) Failed get on Object {id:_, info..} for keystring(info.otherInfo.something.lists) Found(info)(…)
+ /* wrong path */
+ _II.strict.get(user, 'info.contact.something.lists');
+ => Uncaught Error: (_II ERROR) Failed get on Object {id:_, info..} for keystring(info.contact.something.lists) Found(info.contact)(…)
+ 
+ /* wrong type */
+ _II.strict.getArray(user, 'info.contact.email');
+ => Uncaught Error: (_II ERROR) Failed get on Object {id:_, info..} for keystring(info.contact.email) expected(Array) found(string)(…)
  ```
