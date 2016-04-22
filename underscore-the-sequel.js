@@ -97,7 +97,8 @@ var _II = {};
     };
 
     _ii.hasKey = function(obj, keyString) {
-        if(!_ii.nonEmptyString(keyString)) return false;
+        if(!_ii.nonEmptyString(keyString))
+            throw _ii.badArg('hasKey', 'a non-empty String', 'Second');
 
         try {
             var tryVal = obj;
