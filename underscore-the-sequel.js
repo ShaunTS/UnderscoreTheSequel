@@ -19,6 +19,25 @@ var _II = {};
         return obj;
     };
 
+    _ii.describeType = function(thing) {
+
+        let typ = (typeof thing);
+
+        switch(typ) {
+
+            case "object":
+                if(_.isNull(thing)) return "null";
+                if(thing instanceof Array) return "Array";
+                if(thing instanceof Error) return "Error";
+                if(thing instanceof Object) return "Object";
+
+            case "number":
+                if(_.isNaN(thing)) return "NaN";
+
+            default: return typ;
+        }
+    }
+
     _ii.errors = {};
 
     _ii.errors.badArg = function(functionName, expected, pos) {
@@ -234,12 +253,13 @@ var _II = {};
         );
     };
 
-    _ii.errors.failedGetType = function(obj, keyString, typ) {
+    _ii.errors.failedGetType = function(obj, keyString, typ, found) {
         return Error(
             [
                 '(_II ERROR) Failed get on ', _ii.describe(obj),
                 ' for keystring(', keyString, ') ',
-                'not of type(', typ, ')'
+                'expected(', typ, ') ',
+                'found(', found, ')'
             ].join("")
         );
     };
@@ -279,7 +299,9 @@ var _II = {};
 
         if(typeof getVal == 'boolean') return getVal;
 
-        throw _ii.errors.failedGetType(obj, keyString, 'boolean');
+        let found = _ii.describeType(getVal);
+
+        throw _ii.errors.failedGetType(obj, keyString, 'boolean', found);
     }
 
     _ii.strict.getString = function(obj, keyString) {
@@ -291,7 +313,9 @@ var _II = {};
 
         if(typeof getVal == 'string') return getVal;
 
-        throw _ii.errors.failedGetType(obj, keyString, 'string');
+        let found = _ii.describeType(getVal);
+
+        throw _ii.errors.failedGetType(obj, keyString, 'string', found);
     }
 
     _ii.strict.getArray = function(obj, keyString) {
@@ -303,7 +327,9 @@ var _II = {};
 
         if(getVal instanceof Array) return getVal;
 
-        throw _ii.errors.failedGetType(obj, keyString, 'Array');
+        let found = _ii.describeType(getVal);
+
+        throw _ii.errors.failedGetType(obj, keyString, 'Array', found);
     }
 
     _ii.strict.getInt = function(obj, keyString) {
@@ -315,7 +341,9 @@ var _II = {};
 
         if(_ii.nonEmptyNumber(getVal)) return getVal;
 
-        throw _ii.errors.failedGetType(obj, keyString, 'integer');
+        let found = _ii.describeType(getVal);
+
+        throw _ii.errors.failedGetType(obj, keyString, 'integer', found);
     }
 
     _ii.println = function(tag, val) {
