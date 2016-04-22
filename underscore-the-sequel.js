@@ -227,22 +227,18 @@ var _II = {};
 
         if(!_ii.nonEmptyString(keyString)) return fallback;
 
-        try {
+        if(_ii.isMissing(obj, keyString)) return fallback;
 
-            var tryVal = obj;
+        var tryVal = obj;
 
-            _.each(keyString.split("."), function(key) {
-                tryVal = tryVal[key];
-            });
+        _.each(keyString.split("."), function(key) {
+            tryVal = tryVal[key];
+        });
 
-            if(_ii.isNone(tryVal)) return fallback;
+        if(_ii.isNone(tryVal)) return fallback;
 
-            return tryVal;
-        }
-        catch(e) {
-            return fallback;
-        }
-    }
+        return tryVal;
+    };
 
     _ii.getArray = function(obj, keyString) {
 
