@@ -22,7 +22,7 @@ var _II = {};
     _ii.errors = {};
 
     _ii.errors.failedGet = function(obj, keyString) {
-        throw Error(
+        return Error(
             [
                 '(_II ERROR) Failed get on ', _ii.describe(obj),
                 ' for keystring(', keyString, ') '
@@ -31,11 +31,23 @@ var _II = {};
     };
 
     _ii.errors.failedGetType = function(obj, keyString, typ) {
-        throw Error(
+        return Error(
             [
                 '(_II ERROR) Failed get on ', _ii.describe(obj),
                 ' for keystring(', keyString, ') ',
                 'not of type(', typ, ')'
+            ].join("")
+        );
+    };
+
+    _ii.errors.badArg = function(functionName, expected, pos) {
+        var position = pos || "First";
+
+        return Error(
+            [
+                '(_II Error) ',
+                position, " arguement of '", functionName,
+                "' must be ", expected
             ].join("")
         );
     };
@@ -106,10 +118,10 @@ var _II = {};
 
     _ii.hasKeys = function(obj, keys) {
         if(!(obj instanceof Object))
-            throw Error("First arguement of 'hasKeys' must be an Object");
+            throw _ii.errors.badArg('hasKeys', 'an Object');
 
         if(!(keys instanceof Array))
-            throw Error("Second arguement of 'hasKeys' must be an Array");
+            throw _ii.errors.badArg('hasKeys', 'an Array', 'Second');
 
         return _.every(keys, function(key) {
             return _ii.hasKey(obj, key);
@@ -123,10 +135,10 @@ var _II = {};
     _ii.isMissingAny = function(obj, keys) {
 
         if(!(obj instanceof Object))
-            throw Error("First arguement of 'isMissingAny' must be an Object");
+            throw _ii.errors.badArg('isMissingAny', 'an Object');
 
         if(!(keys instanceof Array))
-            throw Error("Second arguement of 'isMissingAny' must be an Array");
+            throw _ii.errors.badArg('isMissingAny', 'an Array', 'Second');
 
         return _.any(keys, function(key) {
             return _ii.isMissing(obj, key);
@@ -185,7 +197,7 @@ var _II = {};
     _ii.get = function(obj, keyString) {
 
         if(!_ii.nonEmptyString(keyString))
-            _ii.errors.failedGet(obj, keyString)
+            throw _ii.errors.failedGet(obj, keyString);
 
         try {
             var tryVal = obj;
@@ -197,7 +209,7 @@ var _II = {};
             return tryVal;
         }
         catch(e) {
-            _ii.errors.failedGet(obj, keyString)
+            throw _ii.errors.failedGet(obj, keyString);
         }
     }
 
@@ -205,7 +217,7 @@ var _II = {};
         let getVal = _ii.get(obj, keyString);
 
         if(typeof getVal !== 'boolean')
-            _ii.errors.failedGetType();
+            throw _ii.errors.failedGetType(obj, keyString, 'boolean');
 
         return getVal;
     }
